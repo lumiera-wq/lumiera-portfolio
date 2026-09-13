@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lumiera — Let's Get It Seen</title>
+<meta name="description" content="Lumiera is a creative content company helping brands turn ideas, products, people and moments into content that gets attention." />
+
+<style>
+/* ==========================================================================
+   LUMIERA — DESIGN TOKENS
+   Edit the variables below to change the look of the entire site.
+   ========================================================================== */
+:root{
+  /* Brand colours — do not introduce colours outside this palette */
+  --color-bg:        #ffc2c2;  /* primary background */
+  --color-ink:       #3e1416;  /* secondary / text colour */
+  --color-cream:     #ffffcc;  /* accent + muted text */
+  --color-bg-dark:   #3e1416;  /* dark section background (= secondary) */
+  --color-on-dark:   #ffc2c2;  /* text on dark sections */
+  --color-on-dark-muted: #ffffcc;
+
+  /* Utility tones derived only for legibility scrims — not brand colours */
+  --overlay-dark: rgba(62,20,22,0.55);
+  --overlay-darker: rgba(62,20,22,0.78);
+  --hairline: rgba(62,20,22,0.16);
+  --hairline-on-dark: rgba(255,194,194,0.22);
+
+  --font-head: "Times New Roman", "Noto Serif", Georgia, serif;
+  --font-body: "Arial Nova", Arial, Helvetica, sans-serif;
+
+  --container: 1240px;
+  --gutter: clamp(24px, 5vw, 72px);
+
+  --ease: cubic-bezier(.22,.61,.36,1);
+  --dur: 0.6s;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
+
+*,*::before,*::after{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+body{
+  margin:0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+img,video{ max-width:100%; display:block; }
+a{ color: inherit; text-decoration: none; }
+button{ font-family: inherit; cursor:pointer; }
+.wrap{ max-width: var(--container); margin: 0 auto; padding: 0 var(--gutter); }
+.eyebrow-hidden{ /* intentionally no tracked-out eyebrow labels — see design brief */ }
+
+h1,h2,h3{ font-family: var(--font-head); font-weight:700; margin:0; letter-spacing:-0.01em; }
+p{ margin:0; }
+
+.section{ position:relative; padding: clamp(72px,12vw,148px) 0; }
+.section-dark{ background: var(--color-bg-dark); color: var(--color-on-dark); }
+.section-dark h1, .section-dark h2, .section-dark h3{ color: var(--color-on-dark); }
+
+.head-row{
+  display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between;
+  gap: 24px; margin-bottom: clamp(36px,6vw,72px);
+}
+.head-row h2{ font-size: clamp(2.2rem, 5vw, 3.4rem); max-width: 14ch; line-height:1.02; }
+.head-row .support{
+  max-width: 34ch; font-size: 1.05rem; opacity:.85;
+}
+.section-dark .head-row .support{ color: var(--color-on-dark-muted); opacity:1; }
+.section:not(.section-dark) .head-row .support{ color: var(--color-ink); opacity:.72; }
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex; align-items:center; gap:10px;
+  padding: 16px 30px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight:700;
+  letter-spacing:.01em;
+  border-radius: 2px;
+  border: 1.5px solid var(--color-ink);
+  transition: transform var(--dur) var(--ease), background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.btn-primary{ background: var(--color-ink); color: var(--color-bg); }
+.btn-primary:hover{ background: transparent; color: var(--color-ink); transform: translateY(-2px); }
+.btn-secondary{ background: transparent; color: var(--color-ink); }
+.btn-secondary:hover{ background: var(--color-ink); color: var(--color-bg); transform: translateY(-2px); }
+.section-dark .btn{ border-color: var(--color-on-dark); }
+.section-dark .btn-primary{ background: var(--color-on-dark); color: var(--color-ink); }
+.section-dark .btn-primary:hover{ background: transparent; color: var(--color-on-dark); }
+.section-dark .btn-secondary{ color: var(--color-on-dark); }
+.section-dark .btn-secondary:hover{ background: var(--color-on-dark); color: var(--color-ink); }
+.btn:focus-visible{ outline: 2px solid var(--color-ink); outline-offset: 3px; }
+
+/* ==========================================================================
+   NAVIGATION
+   ========================================================================== */
+.nav{
+  position: fixed; top:0; left:0; right:0; z-index: 500;
+  background: rgba(255,194,194,0.88);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--hairline);
+  transition: background var(--dur) var(--ease);
+}
+.nav.is-dark{ background: rgba(62,20,22,0.9); border-bottom-color: var(--hairline-on-dark); }
+.nav-inner{
+  max-width: var(--container); margin:0 auto; padding: 18px var(--gutter);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.nav-logo{
+  font-family: var(--font-head); font-weight:700; font-size:1.3rem; letter-spacing:.04em;
+}
+.nav.is-dark .nav-logo{ color: var(--color-on-dark); }
+.nav-links{ display:flex; gap: clamp(20px,3vw,44px); list-style:none; margin:0; padding:0; }
+.nav-links a{
+  font-size:.92rem; font-weight:600; position:relative; padding-bottom:4px;
+}
+.nav-links a::after{
+  content:""; position:absolute; left:0; bottom:0; width:0; height:1.5px;
+  background: currentColor; transition: width var(--dur) var(--ease);
+}
+.nav-links a:hover::after{ width:100%; }
+.nav.is-dark .nav-links a{ color: var(--color-on-dark); }
+
+.nav-toggle{ display:none; background:none; border:0; padding:8px; }
+.nav-toggle span{ display:block; width:26px; height:2px; background: var(--color-ink); margin:6px 0; transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease); }
+.nav.is-dark .nav-toggle span{ background: var(--color-on-dark); }
+
+@media (max-width: 860px){
+  .nav-links{
+    position:fixed; inset:0 0 0 auto; top:0; height:100vh; width:min(78vw,340px);
+    background: var(--color-ink); color: var(--color-bg);
+    flex-direction:column; justify-content:center; gap:34px;
+    padding: 40px var(--gutter);
+    transform: translateX(100%); transition: transform var(--dur) var(--ease);
+  }
+  .nav-links.is-open{ transform: translateX(0); }
+  .nav-links a{ color: var(--color-bg); font-size:1.3rem; }
+  .nav-toggle{ display:block; z-index: 600; }
+  .nav-toggle.is-open span:nth-child(1){ transform: translateY(8px) rotate(45deg); }
+  .nav-toggle.is-open span:nth-child(2){ opacity:0; }
+  .nav-toggle.is-open span:nth-child(3){ transform: translateY(-8px) rotate(-45deg); }
+}
+
+/* ==========================================================================
+   HERO
+   ========================================================================== */
+.hero{
+  min-height: 100vh;
+  display:flex; flex-direction:column; justify-content:center;
+  padding-top: 120px; padding-bottom: 60px;
+  position:relative;
+}
+.hero-grid{
+  display:grid; grid-template-columns: 1.25fr 0.9fr; gap: clamp(32px,5vw,80px);
+  align-items:start;
+}
+.hero-copy p{
+  font-family: var(--font-head);
+  font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+  line-height:1.18;
+  margin-bottom: 26px;
+  max-width: 18ch;
+}
+.hero-copy p:nth-of-type(1){ font-weight:700; }
+.hero-copy p:nth-of-type(2){ font-weight:400; opacity:.86; font-size: clamp(1.15rem,2vw,1.5rem); max-width:32ch; font-family: var(--font-body); }
+.hero-copy p:nth-of-type(3){ font-weight:700; font-style:italic; margin-bottom: 40px; }
+.hero-actions{ display:flex; flex-wrap:wrap; gap:16px; }
+
+.hero-visual{
+  position:relative; aspect-ratio: 4/5; border: 1.5px solid var(--color-ink);
+  overflow:hidden; background: var(--color-cream);
+}
+.hero-visual img{ width:100%; height:100%; object-fit:cover; }
+.hero-visual .placeholder{
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:14px; text-align:center; padding: 24px;
+}
+.hero-visual .placeholder svg{ width:46px; height:46px; opacity:.55; }
+.hero-visual .placeholder span{ font-size:.82rem; letter-spacing:.03em; opacity:.6; max-width:22ch; }
+
+@media (max-width: 900px){
+  .hero-grid{ grid-template-columns: 1fr; }
+  .hero-visual{ aspect-ratio: 16/10; }
+}
+
+/* ==========================================================================
+   SELECTED WORK (intro + jump filters)
+   ========================================================================== */
+.filter-row{ display:flex; flex-wrap:wrap; gap:14px; }
+.filter-chip{
+  padding: 12px 22px; border:1.5px solid var(--color-ink); font-size:.88rem; font-weight:700;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.filter-chip:hover, .filter-chip.is-active{ background: var(--color-ink); color: var(--color-bg); transform: translateY(-2px); }
+
+/* ==========================================================================
+   PROJECT GRID / CARDS
+   ========================================================================== */
+.project-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap: 28px; }
+.project-grid.grid-2{ grid-template-columns: repeat(2,1fr); }
+@media (max-width: 1000px){ .project-grid{ grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 640px){ .project-grid, .project-grid.grid-2{ grid-template-columns: 1fr; } }
+
+.card{
+  position:relative; overflow:hidden; background: var(--color-ink);
+  aspect-ratio: 4/5; border: none;
+  text-align:left; width:100%; padding:0;
+}
+.card video, .card .card-fallback{ width:100%; height:100%; object-fit:cover; }
+.card video{ transition: transform 0.8s var(--ease); }
+.card:hover video{ transform: scale(1.06); }
+
+.card-fallback{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;
+  background: linear-gradient(160deg, #4a191c 0%, #2c0d0f 100%);
+  color: var(--color-on-dark-muted);
+}
+.card-fallback svg{ width:34px; height:34px; opacity:.7; }
+.card-fallback span{ font-size:.76rem; opacity:.6; letter-spacing:.02em; }
+
+.card-caption{
+  position:absolute; left:0; right:0; bottom:0; padding: 22px 22px 24px;
+  background: linear-gradient(0deg, var(--overlay-darker) 0%, transparent 100%);
+  color: var(--color-on-dark);
+  transform: translateY(8px); opacity:.92;
+  transition: transform var(--dur) var(--ease);
+}
+.card:hover .card-caption{ transform: translateY(0); }
+.card-caption .title{ font-family: var(--font-head); font-size:1.15rem; font-weight:700; }
+.card-caption .client{ font-size:.8rem; color: var(--color-cream); margin-top:4px; }
+
+.cta-link{
+  display:inline-block; margin-top: 40px; font-weight:700; font-size:.98rem;
+  padding-bottom:3px; border-bottom: 1.5px solid currentColor;
+}
+
+/* ---------- Coming soon (Brand & Product) ---------- */
+.coming-soon{
+  border: 1.5px solid var(--color-ink);
+  padding: clamp(48px,8vw,96px) clamp(24px,6vw,64px);
+  text-align:center; display:flex; flex-direction:column; align-items:center; gap:22px;
+}
+.coming-soon h3{ font-size: clamp(1.8rem,4vw,2.6rem); }
+.coming-soon p{ max-width:46ch; opacity:.75; }
+.coming-soon .tags{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:6px; }
+.coming-soon .tags span{ border:1px solid var(--color-ink); padding:8px 16px; font-size:.8rem; font-weight:600; opacity:.75; }
+
+/* ==========================================================================
+   SERVICES
+   ========================================================================== */
+.services-list{ border-top: 1px solid var(--hairline); }
+.service-row{
+  display:grid; grid-template-columns: 1fr 2fr; gap: 32px;
+  padding: 34px 0; border-bottom: 1px solid var(--hairline);
+  align-items:baseline;
+}
+.service-row h3{ font-size: clamp(1.4rem,2.6vw,1.9rem); }
+.service-row p{ max-width: 46ch; opacity:.78; font-size:1rem; }
+@media (max-width:700px){ .service-row{ grid-template-columns:1fr; gap:10px; } }
+
+/* ==========================================================================
+   ABOUT
+   ========================================================================== */
+.about-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: clamp(32px,6vw,90px); align-items:start; }
+.about-grid h2{ font-size: clamp(2.1rem,4.6vw,3.2rem); line-height:1.08; }
+.about-grid .story p{ font-size: 1.12rem; margin-bottom: 20px; max-width: 46ch; }
+@media (max-width:800px){ .about-grid{ grid-template-columns:1fr; } }
+
+/* ==========================================================================
+   FINAL CTA
+   ========================================================================== */
+.cta-final{ text-align:center; }
+.cta-final h2{ font-size: clamp(2.6rem,7vw,5.4rem); line-height:0.98; margin-bottom: 26px; }
+.cta-final .support{ max-width:52ch; margin: 0 auto 44px; font-size:1.1rem; opacity:.85; }
+.cta-email{
+  display:inline-block; font-family: var(--font-head); font-size: clamp(1.3rem,3vw,2rem);
+  border-bottom: 2px solid currentColor; padding-bottom: 6px; margin-bottom: 56px;
+  transition: opacity var(--dur) var(--ease);
+}
+.cta-email:hover{ opacity:.65; }
+.social-row{ display:flex; gap:28px; justify-content:center; list-style:none; padding:0; margin:0; }
+.social-row a{ font-size:.9rem; font-weight:700; border-bottom:1px solid transparent; }
+.social-row a:hover{ border-bottom-color: currentColor; }
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.footer{ padding: 48px 0; }
+.footer-inner{ display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:20px; }
+.footer-logo{ font-family: var(--font-head); font-weight:700; font-size:1.1rem; }
+.footer-tag{ font-size:.85rem; opacity:.7; margin-top:4px; }
+.footer-meta{ font-size:.8rem; opacity:.6; text-align:right; }
+
+/* ==========================================================================
+   MODAL
+   ========================================================================== */
+.modal-overlay{
+  position:fixed; inset:0; background: var(--overlay-darker); z-index:1000;
+  display:flex; align-items:center; justify-content:center; padding: 24px;
+  opacity:0; pointer-events:none; transition: opacity var(--dur) var(--ease);
+}
+.modal-overlay.is-open{ opacity:1; pointer-events:auto; }
+.modal-box{
+  width:min(920px,100%); background: var(--color-ink); position:relative;
+  transform: translateY(16px) scale(.98); transition: transform var(--dur) var(--ease);
+}
+.modal-overlay.is-open .modal-box{ transform: translateY(0) scale(1); }
+.modal-box video, .modal-box .card-fallback{ width:100%; aspect-ratio:16/9; }
+.modal-info{ padding: 22px 26px; color: var(--color-on-dark); }
+.modal-info .title{ font-family: var(--font-head); font-size:1.3rem; }
+.modal-info .client{ opacity:.65; font-size:.85rem; margin-top:4px; }
+.modal-close{
+  position:absolute; top:-46px; right:0; background:none; border:1.5px solid var(--color-bg);
+  color: var(--color-bg); width:38px; height:38px; border-radius:50%; font-size:1.1rem;
+}
+
+/* Fade-up reveal — single orchestrated pattern, not per-card scattering */
+.reveal{ opacity:0; transform: translateY(22px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+.reveal.is-visible{ opacity:1; transform:none; }
+
+.visually-hidden{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<nav class="nav" id="siteNav">
+  <div class="nav-inner">
+    <a href="#top" class="nav-logo">LUMIERA</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div class="hero-copy reveal">
+      <p>Talent without visibility only gets you so far.</p>
+      <p>We exist to close that gap, turning great work into content the world can't scroll past.</p>
+      <div class="hero-actions">
+        <a href="#work" class="btn btn-primary">View Our Work</a>
+        <a href="#contact" class="btn btn-secondary">Start a Project</a>
+      </div>
+    </div>
+
+    <!-- EDIT HERE: replace the placeholder with a real image of Lumiera / the team -->
+    <div class="hero-visual reveal">
+      <img src="/images/lumiera-team.jpg" alt="Lumiera creative team" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="placeholder" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        <span>Add a photo of the Lumiera team or a brand visual here</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     SECTION 1 — SELECTED WORK (intro + filters)
+     ============================================================ -->
+<section class="section" id="work">
+  <div class="wrap">
+    <div class="head-row reveal">
+      <h2>Selected Work</h2>
+      <p class="support">A look at what happens when strategy meets visual storytelling.</p>
+    </div>
+    <div class="filter-row reveal">
+      <a href="#social-shoots" class="filter-chip">Social Media Shoots</a>
+      <a href="#events" class="filter-chip">Events</a>
+      <a href="#brand-product" class="filter-chip">Brand &amp; Product</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 2 — SOCIAL MEDIA SHOOTS
+     Edit the PROJECTS.social array in the script below to
+     add, remove or replace projects — no HTML editing needed.
+     ============================================================ -->
+<section class="section section-dark" id="social-shoots">
+  <div class="wrap">
+    <div class="head-row reveal">
+      <h2>Social Media Shoots</h2>
+      <p class="support">Content designed to make brands look as good as the work they do.</p>
+    </div>
+    <div class="project-grid reveal" id="grid-social"></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 3 — EVENTS
+     ============================================================ -->
+<section class="section" id="events">
+  <div class="wrap">
+    <div class="head-row reveal">
+      <h2>Events</h2>
+      <p class="support">Capturing the moments, energy and stories people want to remember.</p>
+    </div>
+    <div class="project-grid reveal" id="grid-events"></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 4 — BRAND & PRODUCT (Coming Soon)
+     ============================================================ -->
+<section class="section section-dark" id="brand-product">
+  <div class="wrap">
+    <div class="head-row reveal">
+      <h2>Brand &amp; Product</h2>
+      <p class="support">Turning products and ideas into visual stories people want to stop for.</p>
+    </div>
+    <div class="coming-soon reveal">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      <h3>Coming Soon</h3>
+      <p>We're building out our brand and product commercial work — campaigns that bring products and ideas to life on screen. This space will hold that story soon.</p>
+      <div class="tags">
+        <span>Product Films</span>
+        <span>Brand Commercials</span>
+        <span>Launch Campaigns</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 5 — SERVICES
+     ============================================================ -->
+<section class="section" id="services">
+  <div class="wrap">
+    <div class="head-row reveal">
+      <h2>What We Do</h2>
+    </div>
+    <div class="services-list reveal">
+      <div class="service-row">
+        <h3>Creative Campaign Strategy</h3>
+        <p>Ideas and creative direction designed around what your brand needs to communicate.</p>
+      </div>
+      <div class="service-row">
+        <h3>Social Media Shoots</h3>
+        <p>Strategic, visually compelling content created for brands, founders and creators.</p>
+      </div>
+      <div class="service-row">
+        <h3>Brand &amp; Product Commercials</h3>
+        <p>Visual campaigns and commercials that bring products and brands to life.</p>
+      </div>
+      <div class="service-row">
+        <h3>Video Editing</h3>
+        <p>Polished, engaging edits built for modern digital platforms.</p>
+      </div>
+      <div class="service-row">
+        <h3>BTS Content</h3>
+        <p>Behind-the-scenes footage that builds trust and shows the story behind the work.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 6 — ABOUT
+     ============================================================ -->
+<section class="section section-dark" id="about">
+  <div class="wrap about-grid">
+    <h2 class="reveal">Good work deserves to be seen.</h2>
+    <div class="story reveal">
+      <p>Lumiera exists to help brands turn what they do into content people notice, remember and act on.</p>
+      <p>We combine creative strategy, visual storytelling and great production to help founders, entrepreneurs and content creators show up with more clarity, consistency and impact.</p>
+      <p>Every content we provide is made to drive the right visibility for you or your brand.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 7 — FINAL CTA
+     ============================================================ -->
+<section class="section cta-final" id="contact">
+  <div class="wrap">
+    <h2 class="reveal">Let's Get It Seen.</h2>
+    <p class="support reveal">Have a brand, product, event or idea that deserves attention or want to see our client success case studies?</p>
+    <!-- EDIT HERE: booking email -->
+    <a href="mailto:booklumiera@gmail.com" class="cta-email reveal">Email : booklumiera@gmail.com</a>
+    <!-- EDIT HERE: replace with real social links -->
+    <ul class="social-row reveal">
+      <li><a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a></li>
+      <li><a href="https://tiktok.com/" target="_blank" rel="noopener">TikTok</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <div>
+      <div class="footer-logo">LUMIERA</div>
+      <div class="footer-tag">Let's Get It Seen.</div>
+    </div>
+    <div class="footer-meta">© 2026 Lumiera. All rights reserved.</div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     PROJECT MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+    <div id="modalMedia"></div>
+    <div class="modal-info">
+      <div class="title" id="modalTitle"></div>
+      <div class="client" id="modalClient"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   PROJECT DATA
+   To add, remove or replace a project: edit the arrays below only.
+   Nothing else in the site needs to change.
+   ========================================================================== */
+const PROJECTS = {
+  social: [
+    { title: "Founder Spotlight Reel",   client: "Client name", video: "/videos/social-01.mp4" },
+    { title: "Product Launch Series",    client: "Client name", video: "/videos/social-02.mp4" },
+    { title: "Behind the Brand",         client: "Client name", video: "/videos/social-03.mp4" }
+  ],
+  events: [
+    { title: "Brand Activation Recap",   client: "Client name", video: "/videos/event-01.mp4" },
+    { title: "Founder Summit Coverage",  client: "Client name", video: "/videos/event-02.mp4" },
+    { title: "Community Launch Night",   client: "Client name", video: "/videos/event-03.mp4" }
+  ]
+};
+
+function fallbackSVG(){
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <rect x="3" y="4" width="18" height="16" rx="1"/><path d="M9 9l6 3-6 3z" fill="currentColor" stroke="none"/>
+          </svg>`;
+}
+
+function renderGrid(containerId, items){
+  const el = document.getElementById(containerId);
+  el.innerHTML = items.map((p, i) => `
+    <button class="card" data-index="${i}" data-group="${containerId}" aria-label="Open ${p.title}">
+      <video muted loop playsinline preload="metadata" onmouseover="this.play()" onmouseout="this.pause()"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <source src="${p.video}" type="video/mp4">
+      </video>
+      <div class="card-fallback" style="display:none;">
+        ${fallbackSVG()}
+        <span>${p.video}</span>
+      </div>
+      <div class="card-caption">
+        <div class="title">${p.title}</div>
+        <div class="client">${p.client}</div>
+      </div>
+    </button>
+  `).join("");
+
+  el.querySelectorAll(".card").forEach(card => {
+    card.addEventListener("click", () => openModal(items[card.dataset.index]));
+  });
+}
+
+renderGrid("grid-social", PROJECTS.social);
+renderGrid("grid-events", PROJECTS.events);
+
+/* ---------- Modal ---------- */
+const overlay = document.getElementById("modalOverlay");
+const modalMedia = document.getElementById("modalMedia");
+const modalTitle = document.getElementById("modalTitle");
+const modalClient = document.getElementById("modalClient");
+let lastFocused = null;
+
+function openModal(project){
+  lastFocused = document.activeElement;
+  modalMedia.innerHTML = `
+    <video controls autoplay muted loop playsinline
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <source src="${project.video}" type="video/mp4">
+    </video>
+    <div class="card-fallback" style="display:none;">
+      ${fallbackSVG()}
+      <span>${project.video}</span>
+    </div>`;
+  modalTitle.textContent = project.title;
+  modalClient.textContent = project.client;
+  overlay.classList.add("is-open");
+  document.body.style.overflow = "hidden";
+  document.getElementById("modalClose").focus();
+}
+function closeModal(){
+  overlay.classList.remove("is-open");
+  modalMedia.innerHTML = "";
+  document.body.style.overflow = "";
+  if (lastFocused) lastFocused.focus();
+}
+document.getElementById("modalClose").addEventListener("click", closeModal);
+overlay.addEventListener("click", e => { if (e.target === overlay) closeModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && overlay.classList.contains("is-open")) closeModal(); });
+
+/* ---------- Mobile nav ---------- */
+const navToggle = document.getElementById("navToggle");
+const navLinks = document.getElementById("navLinks");
+navToggle.addEventListener("click", () => {
+  const isOpen = navLinks.classList.toggle("is-open");
+  navToggle.classList.toggle("is-open", isOpen);
+  navToggle.setAttribute("aria-expanded", isOpen);
+});
+navLinks.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
+  navLinks.classList.remove("is-open");
+  navToggle.classList.remove("is-open");
+  navToggle.setAttribute("aria-expanded", "false");
+}));
+
+/* ---------- Nav colour swap over dark sections ---------- */
+const nav = document.getElementById("siteNav");
+const darkSections = document.querySelectorAll(".section-dark");
+const navObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && entry.boundingClientRect.top < 100){
+      nav.classList.add("is-dark");
+    }
+  });
+  const anyDarkNearTop = Array.from(darkSections).some(s => {
+    const r = s.getBoundingClientRect();
+    return r.top < 80 && r.bottom > 80;
+  });
+  nav.classList.toggle("is-dark", anyDarkNearTop);
+}, { threshold: [0, 1] });
+darkSections.forEach(s => navObserver.observe(s));
+window.addEventListener("scroll", () => {
+  const anyDarkNearTop = Array.from(darkSections).some(s => {
+    const r = s.getBoundingClientRect();
+    return r.top < 80 && r.bottom > 80;
+  });
+  nav.classList.toggle("is-dark", anyDarkNearTop);
+}, { passive: true });
+
+/* ---------- Reveal on scroll ---------- */
+const revealEls = document.querySelectorAll(".reveal");
+if ("IntersectionObserver" in window){
+  const revealObserver = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        entry.target.classList.add("is-visible");
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => revealObserver.observe(el));
+} else {
+  revealEls.forEach(el => el.classList.add("is-visible"));
+}
+</script>
+</body>
+</html>
