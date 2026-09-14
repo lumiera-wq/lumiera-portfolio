@@ -561,7 +561,7 @@ function renderGrid(containerId, items){
   const el = document.getElementById(containerId);
   el.innerHTML = items.map((p, i) => `
     <button class="card" data-index="${i}" data-group="${containerId}" aria-label="Open ${p.title}">
-      <video muted loop playsinline preload="metadata" onmouseover="this.play()" onmouseout="this.pause()"
+      <video muted loop playsinline preload="auto" onmouseover="this.play()" onmouseout="this.pause()"
              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
         <source src="${p.video}" type="video/mp4">
       </video>
