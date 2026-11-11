@@ -533,15 +533,18 @@ p{ margin:0; }
    ========================================================================== */
 const PROJECTS = {
   social: [
-    { title: "Product Showcase",   client: "Hair Brand", video: "videos/social-01.mp4" },
-    { title: "Product showcase ",    client: "Hair Brand", video: "videos/social-02.mp4" },
+    { title: "Product Showcase ",   client: "Hair Brand", video: "videos/social-01.mp4" },
+    { title: "Product showcase ",    client: "Food Brand", video: "videos/social-02.mp4" },
     { title: "Service Showcase",         client: "Tech Brand", video: "videos/social-03.mp4" }
   ],
   events: [
     { title: "Brand Activation Event",   client: "Tech Brand", video: "videos/event-01.mp4" },
-    { title: "Team Bonding Event",  client: "Tech Brand", video: "videos/event-02.mp4" },
-    { title: "10th Anniversary conference",   client: "Tech Brand", video: "videos/event-03.mp4" }
-  ]
+    { title: "Store Grand Opening",  client: "Luxury Gifting Brand", video: "videos/event-02.mp4" },
+    { title: "Beauty in the motherland",   client: "Tech Brand", video: "videos/event-03.mp4" }
+  ],
+   brand: [
+      { title: "Brand Commercial", client: "Spec commercial for Aquafina", video: "videos/product-01.mp4" } 
+   ]
 };
 
 function fallbackSVG(){
@@ -576,6 +579,7 @@ function renderGrid(containerId, items){
 
 renderGrid("grid-social", PROJECTS.social);
 renderGrid("grid-events", PROJECTS.events);
+renderGrid("grid-brand", PROJECTS.brand);
 
 /* ---------- Modal ---------- */
 const overlay = document.getElementById("modalOverlay");
